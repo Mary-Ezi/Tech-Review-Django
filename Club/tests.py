@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User 
 from .models import Meeting, MeetingMinutes, Resource, Event
 from .forms import MeetingForm, ResourceForm
+from django.urls import reverse
 
 
 # Create your tests here.
@@ -60,12 +61,33 @@ class NewResourceForm(TestCase):
  #valid form data
  def test_resourceform(self):
     data = {
-        'resourcename':'Full Stack Web Developer ', 
+        'resource':'Full Stack Web Developer ', 
         'resourcetype':'Online education', 
         'resourceurl':'https://www.udemy.com/course/python-and-django-full-stack-web-developer-bootcamp/?LSNPUBID=vedj0cWlu2Y&ranEAID=vedj0cWlu2Y&ranMID=39197&ranSiteID=vedj0cWlu2Y-1943O6FpQpVyA.9CU4g5KA&utm_medium=udemyads&utm_source=aff-campaign', 
-        'resourcedateentered':'2021-02-20',
-        'resourcedescription':'This course is designed to teach you the latest technologies for building web applications with Python 3 and Django.', 
+        'resourcedate':'2021-02-20',
+        'resourcedesc':'This course is ', 
         'user':'self.u',
      }
     form=ResourceForm (data)
     self.assertTrue(form.is_valid)
+
+class New_Resource_Authentication_Test(TestCase):
+    def setUp(self):
+        self.test_user=User.objects.create_user(username='testuser1', password='P@ssw0rd1')
+        self.resource=Resource.objects.create(resource=' Full Stack Web Developer', 
+        resourcetype='Online education',
+        resourceurl='https://www.udemy.com/course/python-and-django-full-stack-web-developer-bootcamp/?LSNPUBID=vedj0cWlu2Y&ranEAID=vedj0cWlu2Y&ranMID=39197&ranSiteID=vedj0cWlu2Y-1943O6FpQpVyA.9CU4g5KA&utm_medium=udemyads&utm_source=aff-campaign',
+        resourcedate='2021-02-20', 
+        resourcedesc='This course is', 
+        userid=self.test_user)
+
+    def test_redirect_if_not_logged_in(self):
+        response=self.client.get(reverse('newresource'))
+        self.assertRedirects(response, '/accounts/login?next=/Club/newresource/')  
+
+    def test_Logged_in_uses_correct_template(self):
+        login=self.client.login(username='testuser1', password='P@ssw0rd1')
+        response=self.client.get(reverse('newresource'))
+        self.assertEqual(str(response.context['user']), 'testuser1')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'Club/newresource.html')      
