@@ -20,4 +20,6 @@ urlpatterns = [
     path('', include('Club.urls')),
     path('admin/', admin.site.urls),
     path('Club/', include('Club.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
+    
 ]

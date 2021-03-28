@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.conf.urls import include
 
 urlpatterns = [
    path('',views.index, name='index'), 
@@ -8,5 +9,8 @@ urlpatterns = [
    path('meetingdetail/<int:id>', views.meetingdetail, name='meetingdetail'),
    path('newMeeting/', views.newMeeting, name='newmeeting'),
    path('newResource/', views.newResource, name='newresource'),
+   
+   path('loginmessage/', views.loginmessage, name='loginmessage'), 
+   path('logoutmessage/', views.logoutmessage, name='logoutmessage'),
    
 ]
